@@ -12,6 +12,9 @@ export default function GameScreen({ username, mode, rounds, onBack}){
     const [gameOver, owarida] = useState(false);
     const [error, setError] = useState(null);
     const [wholeList, setWholeList] = useState(mode === "scored" && rounds === 0);
+    const [showScore, setShowScore] = useState(false);
+    const [lock, setLock] = useState(true);
+    const [flashGreen, setFlashGreen] = useState(false);
 
     useEffect(() => {
       async function load(){
@@ -44,6 +47,7 @@ export default function GameScreen({ username, mode, rounds, onBack}){
           })
           .finally(() => {
             setL(false);
+            setTimeout(() => {setLock(false)}, 2000);
           });
       }
       load();
@@ -52,6 +56,11 @@ export default function GameScreen({ username, mode, rounds, onBack}){
 
 
     function handleGuess(guess){
+        if(lock){
+          return;
+        }
+        setLock(true);
+        setShowScore(true);
         const [a, b] = currentPair;
         let correct = false;
         if(guess === "higher" && b.score > a.score){
@@ -68,27 +77,35 @@ export default function GameScreen({ username, mode, rounds, onBack}){
         }
         
     
-        if(mode === "scored"){
-          if(correct){
+        setTimeout(() => {
+          if(mode === "scored"){
+            if(correct){
+              setScore(score + 1);
+              setFlashGreen(true);
+              setTimeout(() => setFlashGreen(false), 500);
+            }
+            const nr = round + 1;
+            if((wholeList && nr >= ogList.length - 1) || (!wholeList && nr >= rounds)){
+              owarida(true);
+              return;
+            }
+            setRound(nr);
+            const newList = nextPair(currentPair, animeList);
+            setAL(newList);
+          }
+          else{
+            if(!correct){
+              owarida(true);
+              return;
+            }
             setScore(score + 1);
+            setFlashGreen(true);
+            setTimeout(() => setFlashGreen(false), 500);
+            nextPair(currentPair, animeList);
           }
-          const nr = round + 1;
-          if((wholeList && nr >= ogList.length - 1) || (!wholeList && nr >= rounds)){
-            owarida(true);
-            return;
-          }
-          setRound(nr);
-          const newList = nextPair(currentPair, animeList);
-          setAL(newList);
-        }
-        else{
-          if(!correct){
-            owarida(true);
-            return;
-          }
-          setScore(score + 1);
-          nextPair(currentPair, animeList);
-        }
+          setShowScore(false);
+          setLock(false);
+        }, 1500);
     }
     
     function nextPair(prev, list) {
@@ -114,10 +131,12 @@ export default function GameScreen({ username, mode, rounds, onBack}){
       setScore(0);
       owarida(false);
       setError(null);
-      setL(false);
+      setL(true);
       setAL(ogList);
       setP([null,null]);
       setRound(0);
+      setLock(true);
+      setShowScore(false);
 
       const cute = ogList[Math.floor(Math.random() * ogList.length)];
       let funny;
@@ -132,6 +151,8 @@ export default function GameScreen({ username, mode, rounds, onBack}){
         newList = ogList.filter(anime => anime.title !== cute.title && anime.title !== funny.title);
       }
       setAL(newList);
+      setL(false);
+      setTimeout(() => {setLock(false)}, 2000);
     }
 
     if(loading){
@@ -197,7 +218,7 @@ export default function GameScreen({ username, mode, rounds, onBack}){
       <div className="fade-in min-vh-100 d-flex flex-column" style={{backgroundColor: "black", minHeight:"100vh", color: "white", padding: "20px"}}>
         <div className="container flex-grow-1 d-flex flex-column justify-content-center">
           <div className="text-center mb-4">
-            <h1>Score: {score}</h1>
+            <h1 className={`mb-4 ${flashGreen ? "text-success flash" : ""}`}>Score: {score}</h1>
             {(mode === "scored" && wholeList) && <p>Rounds Left: {ogList.length - round - 1}</p>}
             {(mode === "scored" && !wholeList) && <p>Rounds Left: {rounds - round}</p>}
           </div>
@@ -219,17 +240,19 @@ export default function GameScreen({ username, mode, rounds, onBack}){
                   <img src={currentPair[1].image} alt={currentPair[1].title} className="img-fluid rounded shadow-sm" 
                   style={{ height: "600px", width: "100%", objectFit: "cover", cursor: "pointer"}}></img>
                 </button>
-                <h5 className="mt-2">Score: ???</h5>
+                <div className="position-relative" style={{ height:"1.5em"}}>
+                  {!showScore && <h5 className="position-absolute w-100" style={{ opacity: 1}}>Score: ???</h5>}
+                  <h5 className="mt-2" style={{ opacity: showScore ? 1 : 0, transition: "opacity 0.5s ease"}}>Score: {showScore ? currentPair[1].score : "???"}</h5>
+                </div>
               </div>
           </div>
         </div>
       </div>
-
     )
 }
 
-/*
+
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-*/
+
