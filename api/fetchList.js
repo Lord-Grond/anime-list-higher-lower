@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   
         const extracted = data.data.map(a => ({
           title: a.node.title,
-          image: a.node.main_picture?.medium,
+          image: a.node.main_picture?.large,
           score: a.list_status?.score || 0
         })).filter(a => a.score > 0);
   
