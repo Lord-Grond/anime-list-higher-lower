@@ -172,7 +172,7 @@ export default function GameScreen({ username, mode, rounds, onBack}){
       return (
         <div className="d-flex flex-column justify-content-center align-items-center min-vh-100" style={{ backgroundColor: "black", color: "white"}}>
           <h1 className="mb-3"style={{color: "crimson"}}>Error</h1>
-          <img className="mb-3 img-fluid"src="./src/assets/error.webp" alt="error"></img>
+          <img className="mb-3 img-fluid"src="/error.webp" alt="error"></img>
           <div className="p-4 border rounded shadow bg-danger text-center mb-5" style={{ width:"100%", maxWidth: "400px"}}>{error}</div>
           <button className="btn btn-primary mt-3" onClick={onBack}>Back</button>
         </div>

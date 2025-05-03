@@ -45,7 +45,7 @@ export default function HomeScreen({ onStart }){
 
     return(
         <div className="d-flex flex-column justify-content-center align-items-center min-vh-100 px-2">
-            <img src="./src/assets/hol.webp" alt="hol logo" className="img-fluid" style={{maxWidth:"200px"}}></img>
+            <img src="/hol.webp" alt="hol logo" className="img-fluid" style={{maxWidth:"200px"}}></img>
             <h3 className="text-center mb-5" style={{color:"#0096FF"}}>Anime List Edition</h3>
             <h2 className="text-center mb-5" style={{color:"white", maxWidth:"600px"}}>How well do you know your or someone else's anime list?
                 Find out with this version of anime higher or lower based off user scores.
